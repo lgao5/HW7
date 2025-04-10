@@ -126,8 +126,10 @@ public class ProblemSolutions {
             boolean iDiv = arr[i] % k == 0;
             boolean jDiv = arr[j] % k == 0;
 
-            if ((iDiv && jDiv) || (!iDiv && !jDiv)) { // if both or neither are divisible, follow normal ascending merge
-                temp[idx++] = arr[i] <= arr[j] ? arr[i++] : arr[j++];
+            if (iDiv && jDiv) { // if both divisible, sort descending
+                temp[idx++] = (arr[i] >= arr[j]) ? arr[i++] : arr[j++];
+            } else if (!iDiv && !jDiv) { // if neither divisible, sort ascending
+                temp[idx++] = (arr[i] <= arr[j]) ? arr[i++] : arr[j++];
             } else if (iDiv) { // only left is divisible: left comes first
                 temp[idx++] = arr[i++];
             } else if (jDiv) { // only right is divisible: right comes first
