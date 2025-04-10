@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Larry Gao / COMP 400C 002 SP25
  *
  *   This java file contains the problem solutions for the methods selectionSort,
  *   mergeSortDivisibleByKFirst, asteroidsDestroyed, and numRescueCanoes methods.
@@ -42,6 +42,19 @@ public class ProblemSolutions {
             // "SELECTION SORT" ALGORITHM.
             // DO NOT FORGET TO ADD YOUR NAME / SECTION ABOVE
 
+            int targetIndex = i; // assume current index is target (min or max)
+            for (int j = i + 1; j < n; j++) {
+                if (ascending && values[j] < values[targetIndex]) { // ascending order: find smallest element
+                    targetIndex = j;
+                } else if (!ascending && values[j] > values[targetIndex]) { // descending order: find largest element
+                    targetIndex = j;
+                }
+            }
+
+            // swap found min/max with current index
+            int temp = values[i];
+            values[i] = values[targetIndex];
+            values[targetIndex] = temp;
         }
 
     } // End class selectionSort
@@ -102,9 +115,41 @@ public class ProblemSolutions {
         // TO CODE WITH A SPACE COMPLEXITY OF O(N LOG N), WHICH IS FINE FOR PURPOSES
         // OF THIS PROGRAMMING EXERCISES.
 
-        return;
+        // temp array to store merged result
+        int[] temp = new int[right - left + 1];
+        int i = left;    // start index of left half
+        int j = mid + 1; // start index of right half
+        int idx = 0;     // index for temp array
 
-    }
+        // merge elements with custom logic for divisible-by-k first
+        while (i <= mid && j <= right) {
+            boolean iDiv = arr[i] % k == 0;
+            boolean jDiv = arr[j] % k == 0;
+
+            if ((iDiv && jDiv) || (!iDiv && !jDiv)) { // if both or neither are divisible, follow normal ascending merge
+                temp[idx++] = arr[i] <= arr[j] ? arr[i++] : arr[j++];
+            } else if (iDiv) { // only left is divisible: left comes first
+                temp[idx++] = arr[i++];
+            } else if (jDiv) { // only right is divisible: right comes first
+                temp[idx++] = arr[j++];
+            }
+        }
+           
+        // copy any remaining elements from left half
+        while (i <= mid) {
+            temp[idx++] = arr[i++];
+        }
+
+        // copy any remaining elements from right half
+        while (j <= right) {
+            temp[idx++] = arr[j++];
+        }
+
+        // copy merged result back into original array
+        for (int m = 0; m < temp.length; m++) {
+            arr[left + m] = temp[m];
+        }
+    } // end method mergeDivisbleByKFirst
 
 
     /**
@@ -156,9 +201,25 @@ public class ProblemSolutions {
 
         // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT()
 
-        return false;
+        // sort asteroids in ascending order so planet can eat smallest ones first
+        Arrays.sort(asteroids);
 
-    }
+        long currentMass = mass; // use long to avoid integer overflow
+
+        // loop through each asteroid
+        for (int asteroid : asteroids) {
+            if (currentMass >= asteroid) {
+                // if planet is big enough, absorb asteroid
+                currentMass += asteroid;
+            } else {
+                // if not, planet is destroyed
+                return false;
+            }
+        }
+
+        // if all asteroids are absorbed, return true
+        return true;
+    } // end method asteroidsDestroyed
 
 
     /**
@@ -193,10 +254,27 @@ public class ProblemSolutions {
     public static int numRescueSleds(int[] people, int limit) {
 
         // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT
+ 
+        // sort people by weight (lightest to heaviest)
+        Arrays.sort(people);
 
-        return -1;
+        int left = 0;                  // pointer to lightest person
+        int right = people.length - 1; // pointer to heaviest person
+        int sleds = 0;
 
-    }
+        // pair lightest and heaviest person if possible
+        while (left <= right) {
+            if (people[left] + people[right] <= limit) {
+                // if both can ride together, move both pointers
+                left++;
+            }
+            // in either case, heavier person is taken in this sled
+            right--;
+            sleds++; // one sled used
+        }
+
+        return sleds;
+    } // end method numRescueSleds
 
 } // End Class ProblemSolutions
 
