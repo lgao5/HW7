@@ -115,41 +115,46 @@ public class ProblemSolutions {
         // TO CODE WITH A SPACE COMPLEXITY OF O(N LOG N), WHICH IS FINE FOR PURPOSES
         // OF THIS PROGRAMMING EXERCISES.
 
-        // temp array to store merged result
-        int[] temp = new int[right - left + 1];
-        int i = left;    // start index of left half
-        int j = mid + 1; // start index of right half
-        int idx = 0;     // index for temp array
-
-        // merge elements with custom logic for divisible-by-k first
-        while (i <= mid && j <= right) {
-            boolean iDiv = arr[i] % k == 0;
-            boolean jDiv = arr[j] % k == 0;
-
-            if (iDiv && jDiv) { // if both divisible, sort descending
-                temp[idx++] = (arr[i] >= arr[j]) ? arr[i++] : arr[j++];
-            } else if (!iDiv && !jDiv) { // if neither divisible, sort ascending
-                temp[idx++] = (arr[i] <= arr[j]) ? arr[i++] : arr[j++];
-            } else if (iDiv) { // only left is divisible: left comes first
-                temp[idx++] = arr[i++];
-            } else if (jDiv) { // only right is divisible: right comes first
-                temp[idx++] = arr[j++];
+        // count number of divisible and non-divisible elements
+        int divCount = 0;
+        int nonDivCount = 0;
+    
+        // arrays to hold divisible and non-divisible elements
+        int[] divByK = new int[right - left + 1];
+        int[] nonDivByK = new int[right - left + 1];
+    
+        // partition elements into divisible and non-divisible arrays
+        for (int i = left; i <= right; i++) {
+            if (arr[i] % k == 0) {
+                divByK[divCount++] = arr[i];
+            } else {
+                nonDivByK[nonDivCount++] = arr[i];
             }
         }
-           
-        // copy any remaining elements from left half
-        while (i <= mid) {
-            temp[idx++] = arr[i++];
+    
+        // merge sort implementation for nonDivisibleByK
+        for (int i = 0; i < nonDivCount - 1; i++) {
+            for (int j = i + 1; j < nonDivCount; j++) {
+                if (nonDivByK[i] > nonDivByK[j]) {
+                    // swap if elements are in wrong order
+                    int temp = nonDivByK[i];
+                    nonDivByK[i] = nonDivByK[j];
+                    nonDivByK[j] = temp;
+                }
+            }
         }
-
-        // copy any remaining elements from right half
-        while (j <= right) {
-            temp[idx++] = arr[j++];
+    
+        // reconstruct array with divisible elements first, then sorted non-divisible elements
+        int idx = left;
+    
+        // place divisible elements first (preserving original order)
+        for (int i = 0; i < divCount; i++) {
+            arr[idx++] = divByK[i];
         }
-
-        // copy merged result back into original array
-        for (int m = 0; m < temp.length; m++) {
-            arr[left + m] = temp[m];
+    
+        // place sorted non-divisible elements
+        for (int i = 0; i < nonDivCount; i++) {
+            arr[idx++] = nonDivByK[i];
         }
     } // end method mergeDivisbleByKFirst
 
